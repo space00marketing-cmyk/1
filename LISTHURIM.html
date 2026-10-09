@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ширээний хуваарь</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Manrope:wght@300;400;500&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ECEBE8; --ink:#232322; --muted:#8B8983; --line:#CFCDC8; --panel:#F6F5F3; --accent:#7D6B4F;
+    --serif:"Cormorant Garamond","Times New Roman",serif; --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#1D1D1C; --ink:#EDEBE6; --muted:#8F8D87; --line:#3A3A38; --panel:#262625; --accent:#C2A878; }
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--sans); font-weight:300;
+    padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);
+    -webkit-font-smoothing:antialiased;
+  }
+  main{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:12vh 24px 48px}
+  .logo{height:56px;max-width:240px;object-fit:contain}
+  .wordmark{font-family:var(--serif);font-weight:400;font-size:26px;letter-spacing:.32em;text-indent:.32em;white-space:nowrap}
+  .search{position:relative;width:100%;max-width:420px;margin-top:14vh}
+  .search input{
+    width:100%;background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;
+    padding:14px 2px;font:inherit;font-size:20px;font-weight:300;color:var(--ink);outline:none;
+    transition:border-color .2s;
+  }
+  .search input::placeholder{color:var(--muted)}
+  .search input:focus{border-bottom-color:var(--ink)}
+  .list{
+    position:absolute;left:0;right:0;top:100%;margin-top:6px;background:var(--panel);
+    border:1px solid var(--line);max-height:46vh;overflow:auto;list-style:none;padding:4px 0;z-index:5;
+  }
+  .list[hidden]{display:none}
+  .list li{padding:14px 16px;font-size:17px;cursor:pointer;display:flex;justify-content:space-between;gap:12px}
+  .list li small{color:var(--muted);font-size:13px;align-self:center}
+  .list li[aria-selected="true"],.list li:hover{background:var(--bg)}
+  .list li.msg{cursor:default;color:var(--muted);font-size:15px;line-height:1.5}
+  .list li.msg:hover{background:none}
+  .status{margin-top:20px;font-size:14px;color:var(--muted);min-height:20px;text-align:center}
+
+  /* result popup */
+  .overlay{
+    position:fixed;inset:0;background:rgba(20,20,19,.5);display:flex;align-items:flex-end;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .25s;z-index:10;
+  }
+  .overlay.open{opacity:1;pointer-events:auto}
+  .sheet{
+    background:var(--panel);width:100%;max-width:560px;max-height:94vh;overflow:auto;
+    padding:36px 24px calc(28px + env(safe-area-inset-bottom,0px));text-align:center;
+    transform:translateY(24px);transition:transform .3s ease;
+  }
+  .overlay.open .sheet{transform:none}
+  @media (min-width:640px){ .overlay{align-items:center} .sheet{padding:44px 40px 36px} }
+  .guest{font-size:16px;color:var(--muted)}
+  .num{font-family:var(--serif);font-weight:300;font-size:120px;line-height:1;margin:6px 0 4px}
+  .line{font-size:18px}
+  .plan{position:relative;margin:28px 0 24px;border:1px solid var(--line);background:var(--bg);overflow:hidden}
+  .plan img{display:block;width:100%;height:auto}
+  .plan.demo{aspect-ratio:4/3}
+  .plan .stage{position:absolute;top:4%;left:50%;transform:translateX(-50%);width:34%;height:7%;border:1px solid var(--line);
+    font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+  .plan .t{position:absolute;width:9%;aspect-ratio:1;transform:translate(-50%,-50%);border:1px solid var(--line);border-radius:50%;
+    font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+  .plan .you{
+    position:absolute;width:11%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+    background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;
+  }
+  .plan .you::after{
+    content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px solid var(--accent);
+    animation:ring 1.8s ease-out infinite;
+  }
+  @keyframes ring{from{transform:scale(.85);opacity:.9}to{transform:scale(1.7);opacity:0}}
+  @media (prefers-reduced-motion:reduce){ .plan .you::after{animation:none} .sheet,.overlay{transition:none} }
+  .close{
+    background:none;border:1px solid var(--ink);color:var(--ink);font:inherit;font-size:15px;
+    padding:12px 40px;cursor:pointer;transition:background .2s,color .2s;
+  }
+  .close:hover{background:var(--ink);color:var(--bg)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  /* setup mode */
+  #setup{display:none;width:100%;max-width:640px;margin-top:40px}
+  .setup #setup{display:block}
+  .setup .search,.setup .status{display:none}
+  #setup p{font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.5}
+  #setup textarea{width:100%;height:140px;margin-top:12px;background:var(--panel);color:var(--ink);border:1px solid var(--line);padding:10px;font:13px/1.5 ui-monospace,monospace}
+  #setup .plan{cursor:crosshair}
+</style>
+</head>
+<body>
+<main>
+  <div id="brand"></div>
+
+  <div class="search">
+    <input id="q" type="search" placeholder="Нэрээ бичнэ үү" autocomplete="off" autocapitalize="words"
+           role="combobox" aria-expanded="false" aria-controls="list" aria-label="Нэрээ бичнэ үү">
+    <ul id="list" class="list" role="listbox" hidden></ul>
+  </div>
+  <p class="status" id="status" role="status">Жагсаалт ачаалж байна…</p>
+
+  <section id="setup">
+    <p>Тохиргооны горим: ширээн дээр дарж дугаарыг оруулна. Доорх жагсаалтыг <b>TABLES</b>-д хуулж тавина.</p>
+    <div class="plan" id="setupPlan"></div>
+    <textarea id="setupOut" readonly></textarea>
+  </section>
+</main>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="resName">
+  <div class="sheet">
+    <p class="guest" id="resName"></p>
+    <p class="num" id="resNum"></p>
+    <p class="line" id="resLine"></p>
+    <div class="plan" id="resPlan"></div>
+    <button class="close" id="closeBtn">Хаах</button>
+  </div>
+</div>
+
+<script>
+/* ================= CONFIG: зөвхөн эндээс өөрчилнө ================= */
+const CONFIG = {
+  // Google Sheet-ийн URL доторх ID:  docs.google.com/spreadsheets/d/ ЭНД_БАЙНА /edit
+  // Sheet: Share → "Anyone with the link" → Viewer
+  SHEET_ID: "",
+  SHEET_NAME: "Sheet1",          // доод талын tab-ийн нэр
+  LOGO_URL: "",                  // лого файл (png/svg). Хоосон бол текст лого гарна
+  LOGO_TEXT: "THE SPACE",
+  PLAN_IMAGE: "",                // танхимын ширээний зургийн файл (жишээ: "plan.jpg")
+  // Ширээ бүрийн байрлал: ширээний_дугаар: [x%, y%]  (зургийн зүүн дээд = 0,0)
+  // Хоосон бол demo зураг гарна. Байрлалыг олох: ?setup=1 гэж нээнэ.
+  TABLES: {}
+};
+/* ================================================================= */
+
+const DEMO = [
+  ["Бат-Эрдэнэ Оюун",1],["Оюунчимэг Бат",1],["Сарнай Ганбат",2],["Анударь Мөнх",3],
+  ["Тэмүүжин Болд",4],["Номин Эрдэнэ",5],["Билгүүн Цэнд",6],["Хулан Дорж",7]
+];
+
+const $ = id => document.getElementById(id);
+let guests = [];
+let active = -1, shown = [];
+
+/* ---------- brand ---------- */
+$("brand").innerHTML = CONFIG.LOGO_URL
+  ? `<img class="logo" src="${CONFIG.LOGO_URL}" alt="${CONFIG.LOGO_TEXT}">`
+  : `<div class="wordmark">${CONFIG.LOGO_TEXT}</div>`;
+
+/* ---------- data ---------- */
+function parseCSV(text){
+  const rows=[]; let row=[],cell="",q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c=='"'){ if(text[i+1]=='"'){cell+='"';i++} else q=false } else cell+=c }
+    else if(c=='"') q=true;
+    else if(c==","){ row.push(cell); cell="" }
+    else if(c=="\n"||c=="\r"){ if(c=="\r"&&text[i+1]=="\n") i++; row.push(cell); rows.push(row); row=[]; cell="" }
+    else cell+=c;
+  }
+  if(cell!==""||row.length){ row.push(cell); rows.push(row) }
+  return rows;
+}
+const norm = s => s.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
+
+async function load(){
+  try{
+    let rows;
+    if(!CONFIG.SHEET_ID){ rows = DEMO.map(r=>[r[0],String(r[1])]); }
+    else{
+      const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.SHEET_NAME)}`;
+      const res = await fetch(url);
+      if(!res.ok) throw new Error(res.status);
+      rows = parseCSV(await res.text());
+    }
+    guests = rows
+      .filter(r=>r[0] && r[1] && /^\s*\d+/.test(r[1]))        // толгой мөр, хоосон мөрийг алгасна
+      .map(r=>({name:r[0].trim(), table:parseInt(r[1],10), key:norm(r[0])}));
+    const names = {}; guests.forEach(g=>names[g.key]=(names[g.key]||0)+1);
+    guests.forEach(g=>g.dup = names[g.key]>1);
+    $("status").textContent = "";
+  }catch(e){
+    $("status").textContent = "Жагсаалтыг ачаалж чадсангүй. Хуудсаа дахин ачаална уу.";
+  }
+}
+
+/* ---------- search ---------- */
+function find(qs){
+  const q = norm(qs); if(!q) return [];
+  const toks = q.split(" ");
+  return guests
+    .filter(g => toks.every(t => g.key.includes(t)))
+    .sort((a,b)=>{
+      const as=a.key.startsWith(q)?0:1, bs=b.key.startsWith(q)?0:1;
+      return as-bs || a.key.localeCompare(b.key);
+    }).slice(0,8);
+}
+function render(){
+  const v = $("q").value;
+  const list = $("list");
+  if(!v.trim() || !guests.length){ list.hidden=true; $("q").setAttribute("aria-expanded","false"); return }
+  shown = find(v); active = -1;
+  list.innerHTML = shown.length
+    ? shown.map((g,i)=>`<li role="option" data-i="${i}">${esc(g.name)}${g.dup?`<small>${g.table}-р ширээ</small>`:""}</li>`).join("")
+    : `<li class="msg">Олдсонгүй. Нэрийнхээ бичиглэлийг шалгаад дахин оролдоно уу.</li>`;
+  list.hidden=false; $("q").setAttribute("aria-expanded","true");
+}
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function mark(){
+  [...$("list").querySelectorAll("li[role=option]")].forEach((li,i)=>li.setAttribute("aria-selected", i===active));
+}
+$("q").addEventListener("input",render);
+$("q").addEventListener("focus",render);
+$("q").addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){ e.preventDefault(); active=Math.min(active+1,shown.length-1); mark() }
+  else if(e.key==="ArrowUp"){ e.preventDefault(); active=Math.max(active-1,0); mark() }
+  else if(e.key==="Enter"){ if(active>=0) choose(shown[active]); else if(shown.length===1) choose(shown[0]) }
+  else if(e.key==="Escape"){ $("list").hidden=true }
+});
+$("list").addEventListener("click",e=>{
+  const li = e.target.closest("li[data-i]"); if(li) choose(shown[+li.dataset.i]);
+});
+document.addEventListener("click",e=>{ if(!e.target.closest(".search")) $("list").hidden=true });
+
+/* ---------- plan ---------- */
+function demoPositions(){
+  const p={}; let n=1;
+  for(let r=0;r<3;r++) for(let c=0;c<4;c++){ p[n++]=[18+c*21.3, 34+r*27] }
+  return p;
+}
+const hasTables = () => Object.keys(CONFIG.TABLES).length>0;
+
+function drawPlan(el, table){
+  el.innerHTML = ""; el.classList.remove("demo");
+  let pos = CONFIG.TABLES;
+  if(CONFIG.PLAN_IMAGE){
+    el.innerHTML = `<img src="${CONFIG.PLAN_IMAGE}" alt="Танхимын ширээний байршил">`;
+  }else{
+    el.classList.add("demo");
+    el.innerHTML = `<div class="stage">ТАЙЗ</div>`;
+    if(!hasTables()) pos = demoPositions();
+    Object.entries(pos).forEach(([n,[x,y]])=>{
+      el.insertAdjacentHTML("beforeend",`<div class="t" style="left:${x}%;top:${y}%">${n}</div>`);
+    });
+  }
+  if(table!=null && pos[table]){
+    const [x,y]=pos[table];
+    el.insertAdjacentHTML("beforeend",`<div class="you" style="left:${x}%;top:${y}%">${table}</div>`);
+  }
+}
+
+/* ---------- popup ---------- */
+let lastFocus;
+function choose(g){
+  $("list").hidden=true; $("q").blur();
+  $("resName").textContent = g.name;
+  $("resNum").textContent = g.table;
+  $("resLine").textContent = `Та ${g.table}-р ширээнд сууна.`;
+  drawPlan($("resPlan"), g.table);
+  lastFocus = document.activeElement;
+  $("overlay").classList.add("open");
+  $("closeBtn").focus();
+}
+function closePop(){
+  $("overlay").classList.remove("open");
+  $("q").value=""; $("list").hidden=true;
+}
+$("closeBtn").addEventListener("click",closePop);
+$("overlay").addEventListener("click",e=>{ if(e.target.id==="overlay") closePop() });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape" && $("overlay").classList.contains("open")) closePop() });
+
+/* ---------- setup mode (?setup=1) ---------- */
+if(new URLSearchParams(location.search).has("setup")){
+  document.body.classList.add("setup");
+  const el = $("setupPlan"), out = $("setupOut"), saved = {};
+  CONFIG.TABLES = {}; drawPlan(el);
+  el.addEventListener("click",e=>{
+    const r = el.getBoundingClientRect();
+    const x = ((e.clientX-r.left)/r.width*100).toFixed(1), y = ((e.clientY-r.top)/r.height*100).toFixed(1);
+    const n = prompt("Энэ ширээний дугаар?"); if(!n) return;
+    saved[n]=[x,y];
+    el.insertAdjacentHTML("beforeend",`<div class="you" style="left:${x}%;top:${y}%">${esc(n)}</div>`);
+    out.value = "TABLES: {\n" + Object.entries(saved).map(([k,v])=>`  ${k}: [${v[0]}, ${v[1]}],`).join("\n") + "\n}";
+  });
+}
+
+load();
+</script>
+</body>
+</html>
