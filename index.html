@@ -6,11 +6,12 @@
 <title>Ширээний хуваарь</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Manrope:wght@300;400;500&display=swap&subset=cyrillic" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Manrope:wght@300;400;500&display=swap&subset=cyrillic" rel="stylesheet">
 <style>
   :root{
     --bg:#ECEBE8; --ink:#232322; --muted:#8B8983; --line:#CFCDC8; --panel:#F6F5F3; --accent:#7D6B4F;
-    color-scheme:light; --serif:"Cormorant Garamond","Times New Roman",serif; --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+    color-scheme:light;
+    --serif:"Cormorant Garamond","Times New Roman",serif; --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
   }
   *{box-sizing:border-box;margin:0}
   html,body{height:100%}
@@ -19,10 +20,18 @@
     padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);
     -webkit-font-smoothing:antialiased;
   }
-  main{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:12vh 24px 48px}
-  .logo{height:56px;max-width:240px;object-fit:contain}
+  main{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:9vh 24px 48px}
+
+  .hero{display:flex;flex-direction:column;align-items:center;text-align:center}
+  .logo{height:84px;max-width:260px;object-fit:contain}
   .wordmark{font-family:var(--serif);font-weight:400;font-size:26px;letter-spacing:.32em;text-indent:.32em;white-space:nowrap}
-  .search{position:relative;width:100%;max-width:420px;margin-top:14vh}
+  h1{
+    font-family:var(--serif);font-weight:300;font-size:clamp(38px,10vw,56px);line-height:1.1;
+    letter-spacing:.01em;margin-top:40px;
+  }
+  .hint{margin-top:12px;font-size:13px;color:var(--muted);letter-spacing:.02em}
+
+  .search{position:relative;width:100%;max-width:420px;margin-top:36px}
   .search input{
     width:100%;background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;
     padding:14px 2px;font:inherit;font-size:20px;font-weight:300;color:var(--ink);outline:none;
@@ -36,7 +45,7 @@
   }
   .list[hidden]{display:none}
   .list li{padding:14px 16px;font-size:17px;cursor:pointer;display:flex;justify-content:space-between;gap:12px}
-  .list li small{color:var(--muted);font-size:13px;align-self:center}
+  .list li small{color:var(--muted);font-size:13px;align-self:center;white-space:nowrap}
   .list li[aria-selected="true"],.list li:hover{background:var(--bg)}
   .list li.msg{cursor:default;color:var(--muted);font-size:15px;line-height:1.5}
   .list li.msg:hover{background:none}
@@ -44,7 +53,7 @@
 
   /* result popup */
   .overlay{
-    position:fixed;inset:0;background:rgba(20,20,19,.5);display:flex;align-items:flex-end;justify-content:center;
+    position:fixed;inset:0;background:rgba(20,20,19,.45);display:flex;align-items:flex-end;justify-content:center;
     opacity:0;pointer-events:none;transition:opacity .25s;z-index:10;
   }
   .overlay.open{opacity:1;pointer-events:auto}
@@ -54,46 +63,50 @@
     transform:translateY(24px);transition:transform .3s ease;
   }
   .overlay.open .sheet{transform:none}
-  @media (min-width:640px){ .overlay{align-items:center} .sheet{padding:44px 40px 36px} }
+  @media (min-width:640px){ .overlay{align-items:center} .sheet{padding:44px 40px 36px;max-width:900px} }
   .guest{font-size:16px;color:var(--muted)}
   .num{font-family:var(--sans);font-weight:400;font-size:88px;line-height:1;margin:10px 0 8px;font-variant-numeric:lining-nums tabular-nums;letter-spacing:-.02em}
   .line{font-size:18px}
-  .plan{position:relative;margin:28px 0 24px;border:1px solid var(--line);background:var(--bg);overflow:hidden}
-  .plan img{display:block;width:100%;height:auto}
-  .plan.demo{aspect-ratio:4/3}
-  .plan .stage{position:absolute;top:4%;left:50%;transform:translateX(-50%);width:34%;height:7%;border:1px solid var(--line);
-    font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:center}
-  .plan .t{position:absolute;width:7%;aspect-ratio:1;transform:translate(-50%,-50%);border:1px solid var(--line);border-radius:50%;
-    font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:center}
-  .plan .you{
-    position:absolute;width:8.5%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
-    background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;
+
+  /* table plan (drawn SVG) */
+  .plan{margin:28px 0 24px;border:1px solid var(--line);background:var(--bg);overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .plan svg{display:block;width:100%;min-width:820px;height:auto}
+  .plan svg .zone{fill:none;stroke:var(--line);stroke-width:2;stroke-dasharray:8 7}
+  .plan svg .floor{fill:var(--line);opacity:.55}
+  .plan svg .stage-t{font:300 46px var(--serif);fill:var(--muted);letter-spacing:.18em;text-anchor:middle;dominant-baseline:central}
+  .plan svg .tbl circle{fill:var(--panel);stroke:var(--muted);stroke-width:1.5}
+  .plan svg .tbl .ch rect{fill:none;stroke:var(--line);stroke-width:1.5}
+  .plan svg .tbl text{font:400 30px var(--sans);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+  .plan.has-hi svg .tbl:not(.hi),.plan.has-hi svg .pill:not(.hi){opacity:.5}
+  .plan svg .tbl.hi circle{fill:var(--accent);stroke:var(--accent)}
+  .plan svg .tbl.hi .ch rect{stroke:var(--accent)}
+  .plan svg .tbl.hi text{fill:#fff;font-weight:500;font-size:34px}
+  .plan svg .pill ellipse{fill:var(--panel);stroke:var(--accent);stroke-width:1.5}
+  .plan svg .pill text{font:italic 400 24px var(--serif);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+  .plan svg .pill.hi ellipse{fill:var(--accent)}
+  .plan svg .pill.hi text{fill:#fff}
+  .plan svg circle.ring,.plan svg ellipse.ring{
+    fill:none;stroke:var(--accent);stroke-width:2.5;
+    transform-box:fill-box;transform-origin:center;animation:ring 1.8s ease-out infinite;
   }
-  .plan .you::after{
-    content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px solid var(--accent);
-    animation:ring 1.8s ease-out infinite;
-  }
-  @keyframes ring{from{transform:scale(.85);opacity:.9}to{transform:scale(1.7);opacity:0}}
-  @media (prefers-reduced-motion:reduce){ .plan .you::after{animation:none} .sheet,.overlay{transition:none} }
+  @keyframes ring{from{transform:scale(.85);opacity:.9}to{transform:scale(1.6);opacity:0}}
+  @media (prefers-reduced-motion:reduce){ .ring{animation:none!important} .sheet,.overlay{transition:none} }
+
   .close{
     background:none;border:1px solid var(--ink);color:var(--ink);font:inherit;font-size:15px;
     padding:12px 40px;cursor:pointer;transition:background .2s,color .2s;
   }
   .close:hover{background:var(--ink);color:var(--bg)}
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-
-  /* setup mode */
-  #setup{display:none;width:100%;max-width:640px;margin-top:40px}
-  .setup #setup{display:block}
-  .setup .search,.setup .status{display:none}
-  #setup p{font-size:14px;color:var(--muted);margin-bottom:12px;line-height:1.5}
-  #setup textarea{width:100%;height:140px;margin-top:12px;background:var(--panel);color:var(--ink);border:1px solid var(--line);padding:10px;font:13px/1.5 ui-monospace,monospace}
-  #setup .plan{cursor:crosshair}
 </style>
 </head>
 <body>
 <main>
-  <div id="brand"></div>
+  <header class="hero">
+    <div id="brand"></div>
+    <h1>Ширээний хуваарь</h1>
+    <p class="hint">Монголоор бичин хайна уу.</p>
+  </header>
 
   <div class="search">
     <input id="q" type="search" placeholder="Нэрээ бичнэ үү" autocomplete="off" autocapitalize="words"
@@ -101,12 +114,6 @@
     <ul id="list" class="list" role="listbox" hidden></ul>
   </div>
   <p class="status" id="status" role="status">Жагсаалт ачаалж байна…</p>
-
-  <section id="setup">
-    <p>Тохиргооны горим: ширээн дээр дарж дугаарыг оруулна. Доорх жагсаалтыг <b>TABLES</b>-д хуулж тавина.</p>
-    <div class="plan" id="setupPlan"></div>
-    <textarea id="setupOut" readonly></textarea>
-  </section>
 </main>
 
 <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="resName">
@@ -125,27 +132,51 @@ const CONFIG = {
   // Google Sheet-ийн URL доторх ID:  docs.google.com/spreadsheets/d/ ЭНД_БАЙНА /edit
   // Sheet: Share → "Anyone with the link" → Viewer
   SHEET_ID: "",
-  SHEET_NAME: "Sheet1",          // доод талын tab-ийн нэр
-  LOGO_URL: "",                  // лого файл (png/svg). Хоосон бол текст лого гарна
-  LOGO_TEXT: "THE SPACE",
-  PLAN_IMAGE: "",                // танхимын ширээний зургийн файл (жишээ: "plan.jpg")
-  // Ширээ бүрийн байрлал: ширээний_дугаар: [x%, y%]  (зургийн зүүн дээд = 0,0)
-  // Хоосон бол demo зураг гарна. Байрлалыг олох: ?setup=1 гэж нээнэ.
-  TABLES: {}
+  SHEET_NAME: "Sheet1",      // доод талын tab-ийн нэр
+  LOGO_URL: "logo.png",      // index.html-тэй нэг хавтсанд байрлуулна
+  LOGO_TEXT: "THE SPACE"     // logo.png олдохгүй бол энэ текст гарна
 };
 /* ================================================================= */
 
-const DEMO = [
-];
+/* Ширээний байрлал (таны зургаас): түлхүүр → [x, y]. Хүснэгтийн 2-р баганад яг эдгээр нэр бичигдэнэ.
+   x1–x4 = X ширээнүүд, "хос" = Хосын ширээ */
+const LAYOUT = {
+  "1":[413,271],"2":[490,383],"3":[608,431],"4":[863,411],"5":[990,427],"6":[1112,461],
+  "7":[1079,180],"8":[1079,328],"9":[948,181],"10":[1041,68],"11":[906,63],"12":[807,175],
+  "13":[732,66],"14":[651,171],"15":[569,68],"16":[490,164],"17":[410,71],"18":[211,68],
+  "19":[180,183],"20":[163,296],"21":[211,411],"22":[329,468],
+  "x1":[76,64],"x2":[62,201],"x3":[42,334],"x4":[73,453],
+  "хос":[759,506]
+};
+const VIEW = {x:-30, y:-10, w:1346, h:556};
+
+const DEMO = [];
 
 const $ = id => document.getElementById(id);
 let guests = [];
 let active = -1, shown = [];
 
+/* ---------- table labels ---------- */
+const isNum = k => /^\d+$/.test(k);
+const labelOf = k => k==="хос" ? "Хос" : k.toUpperCase();
+const shortOf = k => k==="хос" ? "Хосын ширээ" : isNum(k) ? `${k}-р ширээ` : `${labelOf(k)} ширээ`;
+const sayOf   = k => k==="хос" ? "Та хосын ширээнд сууна." : isNum(k) ? `Та ${k}-р ширээнд сууна.` : `Та ${labelOf(k)} ширээнд сууна.`;
+
+/* "7", "7-р ширээ", "x1", "х1" (кирилл х), "Хосын ширээ" → түлхүүр */
+function tableKey(v){
+  const s = String(v).toLowerCase().replace(/\s+/g,"");
+  if(s.includes("хос")) return "хос";
+  const m = s.replace(/х/g,"x").match(/x?\d+/);
+  return m ? m[0].replace(/^(x?)0+(?=\d)/,"$1") : null;
+}
+
 /* ---------- brand ---------- */
+function wordmark(){ return `<div class="wordmark">${CONFIG.LOGO_TEXT}</div>`; }
 $("brand").innerHTML = CONFIG.LOGO_URL
   ? `<img class="logo" src="${CONFIG.LOGO_URL}" alt="${CONFIG.LOGO_TEXT}">`
-  : `<div class="wordmark">${CONFIG.LOGO_TEXT}</div>`;
+  : wordmark();
+const logoEl = document.querySelector(".logo");
+if(logoEl) logoEl.addEventListener("error",()=>{ $("brand").innerHTML = wordmark() });
 
 /* ---------- data ---------- */
 function parseCSV(text){
@@ -161,26 +192,28 @@ function parseCSV(text){
   if(cell!==""||row.length){ row.push(cell); rows.push(row) }
   return rows;
 }
-const norm = s => s.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
+const norm  = s => s.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
 const clean = s => norm(s).replace(/[-–—.,]/g," ").replace(/\s+/g," ").trim();
 
 async function load(){
   try{
     let rows;
-    if(!CONFIG.SHEET_ID){ rows = DEMO.map(r=>[r[0],String(r[1])]); }
+    if(!CONFIG.SHEET_ID){ rows = DEMO; }
     else{
       const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.SHEET_NAME)}`;
       const res = await fetch(url);
       if(!res.ok) throw new Error(res.status);
       rows = parseCSV(await res.text());
     }
-    guests = rows
-      .filter(r=>r[0] && r[1] && /^\s*\d+/.test(r[1]))        // толгой мөр, хоосон мөрийг алгасна
-      .map(r=>{
-        const name = r[0].trim();
-        const m = name.match(/^(?:[^\s.]{1,2}\.)+\s*(.+)$/);   // "Э.Бат-Эрдэнэ" → "Бат-Эрдэнэ"
-        return {name, table:parseInt(r[1],10), key:clean(name), given:clean(m ? m[1] : name)};
-      });
+    guests = [];
+    rows.forEach((r,i)=>{
+      if(!r[0] || !r[1]) return;
+      const key = tableKey(r[1]);
+      if(!key || !LAYOUT[key]){ if(i>0) console.warn("Танигдаагүй ширээ, мөр "+(i+1)+":", r[0], r[1]); return }   // толгой мөрийг чимээгүй алгасна
+      const name = r[0].trim();
+      const m = name.match(/^(?:[^\s.]{1,2}\.)+\s*(.+)$/);   // "Э.Бат-Эрдэнэ" → "Бат-Эрдэнэ"
+      guests.push({name, table:key, key:clean(name), given:clean(m ? m[1] : name)});
+    });
     const names = {}; guests.forEach(g=>names[g.key]=(names[g.key]||0)+1);
     guests.forEach(g=>g.dup = names[g.key]>1);
     $("status").textContent = "";
@@ -199,17 +232,17 @@ function find(qs){
     .sort((a,b)=> rank(a)-rank(b) || a.given.localeCompare(b.given))
     .slice(0,8);
 }
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function render(){
   const v = $("q").value;
   const list = $("list");
   if(!v.trim() || !guests.length){ list.hidden=true; $("q").setAttribute("aria-expanded","false"); return }
   shown = find(v); active = -1;
   list.innerHTML = shown.length
-    ? shown.map((g,i)=>`<li role="option" data-i="${i}">${esc(g.name)}${g.dup?`<small>${g.table}-р ширээ</small>`:""}</li>`).join("")
+    ? shown.map((g,i)=>`<li role="option" data-i="${i}">${esc(g.name)}${g.dup?`<small>${shortOf(g.table)}</small>`:""}</li>`).join("")
     : `<li class="msg">Олдсонгүй. Нэрийнхээ бичиглэлийг шалгаад дахин оролдоно уу.</li>`;
   list.hidden=false; $("q").setAttribute("aria-expanded","true");
 }
-const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function mark(){
   [...$("list").querySelectorAll("li[role=option]")].forEach((li,i)=>li.setAttribute("aria-selected", i===active));
 }
@@ -227,42 +260,48 @@ $("list").addEventListener("click",e=>{
 document.addEventListener("click",e=>{ if(!e.target.closest(".search")) $("list").hidden=true });
 
 /* ---------- plan ---------- */
-function demoPositions(){
-  const p={}; let n=1;
-  for(let r=0;r<5&&n<=26;r++) for(let c=0;c<6&&n<=26;c++){ p[n++]=[11+c*15.6, 28+r*17.5] }
-  return p;
+function tableSVG(k, hi){
+  const [x,y] = LAYOUT[k];
+  let chairs = "";
+  for(let i=0;i<10;i++) chairs += `<rect x="42" y="-7" width="18" height="14" rx="3" transform="rotate(${i*36})"/>`;
+  return `<g class="tbl${hi?" hi":""}" transform="translate(${x} ${y})">`
+    + (hi ? `<circle class="ring" r="62"/>` : "")
+    + `<g class="ch">${chairs}</g><circle r="34"/><text>${labelOf(k)}</text></g>`;
 }
-const hasTables = () => Object.keys(CONFIG.TABLES).length>0;
-
-function drawPlan(el, table){
-  el.innerHTML = ""; el.classList.remove("demo");
-  let pos = CONFIG.TABLES;
-  if(CONFIG.PLAN_IMAGE){
-    el.innerHTML = `<img src="${CONFIG.PLAN_IMAGE}" alt="Танхимын ширээний байршил">`;
-  }else{
-    el.classList.add("demo");
-    el.innerHTML = `<div class="stage">ТАЙЗ</div>`;
-    if(!hasTables()) pos = demoPositions();
-    Object.entries(pos).forEach(([n,[x,y]])=>{
-      el.insertAdjacentHTML("beforeend",`<div class="t" style="left:${x}%;top:${y}%">${n}</div>`);
+function drawPlan(el, hiKey){
+  const keys = Object.keys(LAYOUT).filter(k=>k!=="хос");
+  const [cx,cy] = LAYOUT["хос"];
+  const hiCouple = hiKey==="хос";
+  el.classList.toggle("has-hi", !!hiKey);
+  el.innerHTML = `<svg viewBox="${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}" role="img" aria-label="Танхимын ширээний байршил">
+    <rect class="zone" x="1175" y="43" width="110" height="432"/>
+    <text class="stage-t" transform="translate(1230 259) rotate(-90)">ТАЙЗ</text>
+    <rect class="zone" x="915" y="128" width="260" height="260"/>
+    <rect class="floor" x="487" y="222" width="409" height="101"/>
+    ${keys.filter(k=>k!==hiKey).map(k=>tableSVG(k,false)).join("")}
+    <g class="pill${hiCouple?" hi":""}">
+      ${hiCouple?`<ellipse class="ring" cx="${cx}" cy="${cy}" rx="76" ry="24"/>`:""}
+      <ellipse cx="${cx}" cy="${cy}" rx="76" ry="24"/><text x="${cx}" y="${cy}">Хосын ширээ</text>
+    </g>
+    ${hiKey && !hiCouple ? tableSVG(hiKey,true) : ""}
+  </svg>`;
+  if(hiKey){
+    requestAnimationFrame(()=>{
+      const svg = el.querySelector("svg");
+      const scale = svg.getBoundingClientRect().width / VIEW.w;
+      el.scrollLeft = (LAYOUT[hiKey][0]-VIEW.x)*scale - el.clientWidth/2;
     });
-  }
-  if(table!=null && pos[table]){
-    const [x,y]=pos[table];
-    el.insertAdjacentHTML("beforeend",`<div class="you" style="left:${x}%;top:${y}%">${table}</div>`);
   }
 }
 
 /* ---------- popup ---------- */
-let lastFocus;
 function choose(g){
   $("list").hidden=true; $("q").blur();
   $("resName").textContent = g.name;
-  $("resNum").textContent = g.table;
-  $("resLine").textContent = `Та ${g.table}-р ширээнд сууна.`;
-  drawPlan($("resPlan"), g.table);
-  lastFocus = document.activeElement;
+  $("resNum").textContent = labelOf(g.table);
+  $("resLine").textContent = sayOf(g.table);
   $("overlay").classList.add("open");
+  drawPlan($("resPlan"), g.table);
   $("closeBtn").focus();
 }
 function closePop(){
@@ -272,21 +311,6 @@ function closePop(){
 $("closeBtn").addEventListener("click",closePop);
 $("overlay").addEventListener("click",e=>{ if(e.target.id==="overlay") closePop() });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape" && $("overlay").classList.contains("open")) closePop() });
-
-/* ---------- setup mode (?setup=1) ---------- */
-if(new URLSearchParams(location.search).has("setup")){
-  document.body.classList.add("setup");
-  const el = $("setupPlan"), out = $("setupOut"), saved = {};
-  CONFIG.TABLES = {}; drawPlan(el);
-  el.addEventListener("click",e=>{
-    const r = el.getBoundingClientRect();
-    const x = ((e.clientX-r.left)/r.width*100).toFixed(1), y = ((e.clientY-r.top)/r.height*100).toFixed(1);
-    const n = prompt("Энэ ширээний дугаар?"); if(!n) return;
-    saved[n]=[x,y];
-    el.insertAdjacentHTML("beforeend",`<div class="you" style="left:${x}%;top:${y}%">${esc(n)}</div>`);
-    out.value = "TABLES: {\n" + Object.entries(saved).map(([k,v])=>`  ${k}: [${v[0]}, ${v[1]}],`).join("\n") + "\n}";
-  });
-}
 
 load();
 </script>
