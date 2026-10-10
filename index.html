@@ -10,10 +10,7 @@
 <style>
   :root{
     --bg:#ECEBE8; --ink:#232322; --muted:#8B8983; --line:#CFCDC8; --panel:#F6F5F3; --accent:#7D6B4F;
-    --serif:"Cormorant Garamond","Times New Roman",serif; --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
-  }
-  @media (prefers-color-scheme:dark){
-    :root{ --bg:#1D1D1C; --ink:#EDEBE6; --muted:#8F8D87; --line:#3A3A38; --panel:#262625; --accent:#C2A878; }
+    color-scheme:light; --serif:"Cormorant Garamond","Times New Roman",serif; --sans:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
   }
   *{box-sizing:border-box;margin:0}
   html,body{height:100%}
@@ -59,17 +56,17 @@
   .overlay.open .sheet{transform:none}
   @media (min-width:640px){ .overlay{align-items:center} .sheet{padding:44px 40px 36px} }
   .guest{font-size:16px;color:var(--muted)}
-  .num{font-family:var(--serif);font-weight:300;font-size:120px;line-height:1;margin:6px 0 4px}
+  .num{font-family:var(--sans);font-weight:400;font-size:88px;line-height:1;margin:10px 0 8px;font-variant-numeric:lining-nums tabular-nums;letter-spacing:-.02em}
   .line{font-size:18px}
   .plan{position:relative;margin:28px 0 24px;border:1px solid var(--line);background:var(--bg);overflow:hidden}
   .plan img{display:block;width:100%;height:auto}
   .plan.demo{aspect-ratio:4/3}
   .plan .stage{position:absolute;top:4%;left:50%;transform:translateX(-50%);width:34%;height:7%;border:1px solid var(--line);
     font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:center}
-  .plan .t{position:absolute;width:9%;aspect-ratio:1;transform:translate(-50%,-50%);border:1px solid var(--line);border-radius:50%;
-    font-size:11px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+  .plan .t{position:absolute;width:7%;aspect-ratio:1;transform:translate(-50%,-50%);border:1px solid var(--line);border-radius:50%;
+    font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:center}
   .plan .you{
-    position:absolute;width:11%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+    position:absolute;width:8.5%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
     background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;
   }
   .plan .you::after{
@@ -127,10 +124,10 @@
 const CONFIG = {
   // Google Sheet-ийн URL доторх ID:  docs.google.com/spreadsheets/d/ ЭНД_БАЙНА /edit
   // Sheet: Share → "Anyone with the link" → Viewer
-  SHEET_ID: "1Rp2uI50S__aafMFYG4w0Ujhg6F2Eot5rD5YvSai0zJc",
-  SHEET_NAME: "Hurim list",          // доод талын tab-ийн нэр
+  SHEET_ID: "",
+  SHEET_NAME: "Sheet1",          // доод талын tab-ийн нэр
   LOGO_URL: "",                  // лого файл (png/svg). Хоосон бол текст лого гарна
-  LOGO_TEXT: "Ширээний хуваарь",
+  LOGO_TEXT: "THE SPACE",
   PLAN_IMAGE: "",                // танхимын ширээний зургийн файл (жишээ: "plan.jpg")
   // Ширээ бүрийн байрлал: ширээний_дугаар: [x%, y%]  (зургийн зүүн дээд = 0,0)
   // Хоосон бол demo зураг гарна. Байрлалыг олох: ?setup=1 гэж нээнэ.
@@ -139,8 +136,8 @@ const CONFIG = {
 /* ================================================================= */
 
 const DEMO = [
-  ["Бат-Эрдэнэ Оюун",1],["Оюунчимэг Бат",1],["Сарнай Ганбат",2],["Анударь Мөнх",3],
-  ["Тэмүүжин Болд",4],["Номин Эрдэнэ",5],["Билгүүн Цэнд",6],["Хулан Дорж",7]
+  ["Э.Бат-Эрдэнэ",1],["Б.Оюунчимэг",1],["Г.Сарнай",12],["М.Анударь",3],
+  ["Д.Бат-Эрдэнэ",26],["Н.Номин",5],["Ц.Билгүүн",18],["Д.Хулан",7]
 ];
 
 const $ = id => document.getElementById(id);
@@ -167,6 +164,7 @@ function parseCSV(text){
   return rows;
 }
 const norm = s => s.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g," ").trim();
+const clean = s => norm(s).replace(/[-–—.,]/g," ").replace(/\s+/g," ").trim();
 
 async function load(){
   try{
@@ -180,7 +178,11 @@ async function load(){
     }
     guests = rows
       .filter(r=>r[0] && r[1] && /^\s*\d+/.test(r[1]))        // толгой мөр, хоосон мөрийг алгасна
-      .map(r=>({name:r[0].trim(), table:parseInt(r[1],10), key:norm(r[0])}));
+      .map(r=>{
+        const name = r[0].trim();
+        const m = name.match(/^(?:[^\s.]{1,2}\.)+\s*(.+)$/);   // "Э.Бат-Эрдэнэ" → "Бат-Эрдэнэ"
+        return {name, table:parseInt(r[1],10), key:clean(name), given:clean(m ? m[1] : name)};
+      });
     const names = {}; guests.forEach(g=>names[g.key]=(names[g.key]||0)+1);
     guests.forEach(g=>g.dup = names[g.key]>1);
     $("status").textContent = "";
@@ -191,14 +193,13 @@ async function load(){
 
 /* ---------- search ---------- */
 function find(qs){
-  const q = norm(qs); if(!q) return [];
+  const q = clean(qs); if(!q) return [];
   const toks = q.split(" ");
+  const rank = g => g.given.startsWith(q) ? 0 : g.given.split(" ").some(w=>w.startsWith(toks[0])) ? 1 : 2;
   return guests
     .filter(g => toks.every(t => g.key.includes(t)))
-    .sort((a,b)=>{
-      const as=a.key.startsWith(q)?0:1, bs=b.key.startsWith(q)?0:1;
-      return as-bs || a.key.localeCompare(b.key);
-    }).slice(0,8);
+    .sort((a,b)=> rank(a)-rank(b) || a.given.localeCompare(b.given))
+    .slice(0,8);
 }
 function render(){
   const v = $("q").value;
@@ -230,7 +231,7 @@ document.addEventListener("click",e=>{ if(!e.target.closest(".search")) $("list"
 /* ---------- plan ---------- */
 function demoPositions(){
   const p={}; let n=1;
-  for(let r=0;r<3;r++) for(let c=0;c<4;c++){ p[n++]=[18+c*21.3, 34+r*27] }
+  for(let r=0;r<5&&n<=26;r++) for(let c=0;c<6&&n<=26;c++){ p[n++]=[11+c*15.6, 28+r*17.5] }
   return p;
 }
 const hasTables = () => Object.keys(CONFIG.TABLES).length>0;
