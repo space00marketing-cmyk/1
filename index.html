@@ -175,7 +175,7 @@
 <div class="overlay center" id="okOverlay" role="dialog" aria-modal="true" aria-labelledby="okTitle">
   <div class="ok">
     <svg viewBox="0 0 80 80" aria-hidden="true"><circle class="okc" cx="40" cy="40" r="36"/><path class="okp" d="M24 41l12 12 21-24"/></svg>
-    <h2 id="okTitle">Цагийг сайхан өнгөрүүлээрэй!</h2>
+    <h2 id="okTitle">Хөгжилтэй өнгөрүүлээрэй!</h2>
     <p>Таны ирц бүртгэгдлээ.</p>
     <button class="close" id="okClose" type="button">Хаах</button>
   </div>
@@ -190,7 +190,7 @@ const CONFIG = {
   SHEET_NAME: "Hurim list",      // доод талын tab-ийн нэр
   LOGO_URL: "logo.png",      // index.html-тэй нэг хавтсанд байрлуулна
   LOGO_TEXT: "Logo",    // logo.png олдохгүй бол энэ текст гарна
-  ATTENDANCE_URL: "https://script.google.com/macros/s/AKfycbyMh6YtyTvcg7ebVqHydLNYu_EJUsCRBTxiQt2y3DxcvG_lu6uaWAfBYinvZLKw04Zq7A/exec"    // Apps Script "Web app" URL (…/exec). Хоосон бол "Ирснээ баталгаажуулах" товч гарахгүй
+  ATTENDANCE_URL: ""    // Apps Script "Web app" URL (…/exec). Хоосон бол "Ирснээ баталгаажуулах" товч гарахгүй
 };
 /* ================================================================= */
 
@@ -407,7 +407,9 @@ $("attBtn").addEventListener("click", async ()=>{
     if(current===g) showAtt();
     openOk();
   }catch(e){
-    if(current===g){ btn.disabled = false; btn.textContent = ATT_LABEL; $("attErr").textContent = "Бүртгэж чадсангүй. Дахин оролдоно уу."; }
+    console.error("Attendance error:", e);
+    const code = e.name==="AbortError" ? "timeout" : e instanceof SyntaxError ? "bad_response" : e instanceof TypeError ? "network" : e.message;
+    if(current===g){ btn.disabled = false; btn.textContent = ATT_LABEL; $("attErr").textContent = "Бүртгэж чадсангүй. Дахин оролдоно уу. (" + code + ")"; }
   }finally{ clearTimeout(timer) }
 });
 
