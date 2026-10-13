@@ -74,35 +74,59 @@
 
   /* attendance */
   .att{margin-top:22px;display:flex;flex-direction:column;align-items:center}
-  .primary{background:var(--ink);color:var(--bg);border:1px solid var(--ink);font:inherit;font-size:16px;padding:15px 32px;width:100%;max-width:340px;cursor:pointer;transition:opacity .2s}
-  .primary:hover{opacity:.88}.primary:disabled{opacity:.55;cursor:default}
-  .att-done{display:inline-flex;align-items:center;gap:8px;color:var(--ok);font-size:16px}
-  .att-done svg{width:22px;height:22px}.att-err{margin-top:10px;font-size:14px;color:#B3402F}.att-err:empty{display:none}
+  .primary{
+    background:var(--ink);color:var(--bg);border:1px solid var(--ink);font:inherit;font-size:16px;font-weight:400;
+    padding:15px 32px;width:100%;max-width:340px;cursor:pointer;transition:opacity .2s;
+  }
+  .primary:hover{opacity:.88}
+  .primary:disabled{opacity:.55;cursor:default}
+  .att-done{display:inline-flex;align-items:center;gap:8px;color:var(--ok);font-size:16px;font-weight:400}
+  .att-done svg{width:22px;height:22px}
+  .att-err{margin-top:10px;font-size:14px;color:#B3402F}
+  .att-err:empty{display:none}
 
-  /* table plan (updated ballroom layout) */
+  /* table plan (drawn SVG) */
   .plan{margin:28px 0 24px;border:1px solid var(--line);background:var(--bg);overflow-x:auto;-webkit-overflow-scrolling:touch}
   .plan svg{display:block;width:100%;min-width:820px;height:auto}
   .plan svg .zone{fill:none;stroke:var(--line);stroke-width:1.2;stroke-dasharray:5 4}
-  .plan svg .floor{fill:var(--line);opacity:.55}.plan svg .block{fill:var(--line);opacity:.8}
+  .plan svg .floor{fill:var(--line);opacity:.55}
+  .plan svg .block{fill:var(--line);opacity:.8}
   .plan svg .block-t{font:600 11px var(--sans);fill:var(--muted);letter-spacing:.06em;text-anchor:middle;dominant-baseline:central}
   .plan svg .stage-t{font:600 17px var(--sans);fill:var(--muted);letter-spacing:.1em;text-anchor:middle;dominant-baseline:central}
-  .plan svg .entry path{fill:var(--entry)}.plan svg .entry text{font:600 10px var(--sans);fill:var(--entry);letter-spacing:.14em;text-anchor:middle}
-  .plan svg .tbl circle{fill:var(--panel);stroke:var(--muted);stroke-width:1}.plan svg .tbl .ch rect{fill:none;stroke:var(--line);stroke-width:1}
+  .plan svg .entry path{fill:var(--entry)}
+  .plan svg .entry text{font:600 10px var(--sans);fill:var(--entry);letter-spacing:.14em;text-anchor:middle}
+  .plan svg .tbl circle{fill:var(--panel);stroke:var(--muted);stroke-width:1}
+  .plan svg .tbl .ch rect{fill:none;stroke:var(--line);stroke-width:1}
   .plan svg .tbl text{font:400 17px var(--sans);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
   .plan.has-hi svg .tbl:not(.hi),.plan.has-hi svg .pill:not(.hi){opacity:.5}
-  .plan svg .tbl.hi circle{fill:var(--accent);stroke:var(--accent)}.plan svg .tbl.hi .ch rect{stroke:var(--accent)}
+  .plan svg .tbl.hi circle{fill:var(--accent);stroke:var(--accent)}
+  .plan svg .tbl.hi .ch rect{stroke:var(--accent)}
   .plan svg .tbl.hi text{fill:#fff;font-weight:500;font-size:20px}
-  .plan svg .pill ellipse{fill:var(--panel);stroke:var(--accent);stroke-width:1}.plan svg .pill text{font:italic 400 13px var(--serif);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
-  .plan svg .pill.hi ellipse{fill:var(--accent)}.plan svg .pill.hi text{fill:#fff}
-  .plan svg circle.ring,.plan svg ellipse.ring{fill:none;stroke:var(--accent);stroke-width:1.8;transform-box:fill-box;transform-origin:center;animation:ring 1.8s ease-out infinite}
+  .plan svg .pill ellipse{fill:var(--panel);stroke:var(--accent);stroke-width:1}
+  .plan svg .pill text{font:italic 400 12px var(--serif);fill:var(--ink);text-anchor:middle;dominant-baseline:central}
+  .plan svg .pill.hi ellipse{fill:var(--accent)}
+  .plan svg .pill.hi text{fill:#fff}
+  .plan svg circle.ring,.plan svg ellipse.ring{
+    fill:none;stroke:var(--accent);stroke-width:1.8;
+    transform-box:fill-box;transform-origin:center;animation:ring 1.8s ease-out infinite;
+  }
   @keyframes ring{from{transform:scale(.85);opacity:.9}to{transform:scale(1.7);opacity:0}}
 
-  /* confirmation + success dialogs */
-  .overlay.center{align-items:center;z-index:20}.dialog{background:var(--panel);width:min(390px,calc(100% - 48px));padding:38px 28px 30px;text-align:center}
-  .dialog h2{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.2;margin-bottom:10px}.dialog p{font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:24px}
-  .dialog-actions{display:flex;gap:10px;justify-content:center}.dialog-actions button{flex:1;max-width:160px}
-  .ok-icon{width:84px;height:84px;margin-bottom:12px}.ok-icon circle,.ok-icon path{fill:none;stroke:var(--ok)}.ok-icon circle{stroke-width:3}.ok-icon path{stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
-  @media (prefers-reduced-motion:reduce){.ring{animation:none!important}.sheet,.overlay{transition:none}}
+  /* success window */
+  .overlay.center{align-items:center;z-index:20}
+  .ok{background:var(--panel);width:min(380px,calc(100% - 48px));padding:44px 28px 32px;text-align:center}
+  .ok svg{width:84px;height:84px}
+  .ok .okc{fill:none;stroke:var(--ok);stroke-width:3;stroke-dasharray:226;stroke-dashoffset:226}
+  .ok .okp{fill:none;stroke:var(--ok);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60}
+  .overlay.open .ok .okc{animation:draw .6s ease forwards}
+  .overlay.open .ok .okp{animation:draw .4s .45s ease forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  .ok h2{font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.2;margin:22px 0 8px}
+  .ok p{font-size:15px;color:var(--muted);margin-bottom:28px}
+  @media (prefers-reduced-motion:reduce){
+    .ring{animation:none!important} .sheet,.overlay{transition:none}
+    .overlay.open .ok .okc,.overlay.open .ok .okp{animation:none;stroke-dashoffset:0}
+  }
 
   .close{
     background:none;border:1px solid var(--ink);color:var(--ink);font:inherit;font-size:15px;
@@ -136,10 +160,10 @@
     <p class="num" id="resNum"></p>
     <p class="line" id="resLine"></p>
     <div class="att" id="attBox" hidden>
-      <button class="primary" id="attBtn" type="button">Ирцээ бүртгүүлэх</button>
+      <button class="primary" id="attBtn" type="button">Ирснээ баталгаажуулах</button>
       <p class="att-done" id="attDone" hidden>
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="var(--ok)"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Already checked in
+        Ирц бүртгэгдсэн байна
       </p>
       <p class="att-err" id="attErr" role="alert"></p>
     </div>
@@ -148,20 +172,12 @@
   </div>
 </div>
 
-<div class="overlay center" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
-  <div class="dialog">
-    <h2 id="confirmTitle">Та ирцээ бүртгүүлэх үү?</h2>
-    <p>Тийм дарснаар таны ирц бүртгэгдэнэ.</p>
-    <div class="dialog-actions"><button class="close" id="confirmNo" type="button">Буцах</button><button class="primary" id="confirmYes" type="button">Тийм</button></div>
-  </div>
-</div>
-
 <div class="overlay center" id="okOverlay" role="dialog" aria-modal="true" aria-labelledby="okTitle">
-  <div class="dialog">
-    <svg class="ok-icon" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36"/><path d="M24 41l12 12 21-24"/></svg>
-    <h2 id="okTitle">Have a good time!</h2>
+  <div class="ok">
+    <svg viewBox="0 0 80 80" aria-hidden="true"><circle class="okc" cx="40" cy="40" r="36"/><path class="okp" d="M24 41l12 12 21-24"/></svg>
+    <h2 id="okTitle">Цагийг сайхан өнгөрүүлээрэй!</h2>
     <p>Таны ирц бүртгэгдлээ.</p>
-    <button class="close" id="okClose" type="button">Close</button>
+    <button class="close" id="okClose" type="button">Хаах</button>
   </div>
 </div>
 
@@ -174,16 +190,18 @@ const CONFIG = {
   SHEET_NAME: "Hurim list",      // доод талын tab-ийн нэр
   LOGO_URL: "logo.png",      // index.html-тэй нэг хавтсанд байрлуулна
   LOGO_TEXT: "Logo",    // logo.png олдохгүй бол энэ текст гарна
-  ATTENDANCE_URL: "https://script.google.com/macros/s/AKfycbyMh6YtyTvcg7ebVqHydLNYu_EJUsCRBTxiQt2y3DxcvG_lu6uaWAfBYinvZLKw04Zq7A/exec"     // Apps Script Web App /exec URL goes here
+  ATTENDANCE_URL: "https://script.google.com/macros/s/AKfycbyMh6YtyTvcg7ebVqHydLNYu_EJUsCRBTxiQt2y3DxcvG_lu6uaWAfBYinvZLKw04Zq7A/exec"    // Apps Script "Web app" URL (…/exec). Хоосон бол "Ирснээ баталгаажуулах" товч гарахгүй
 };
 /* ================================================================= */
 
-/* Updated ballroom layout from the supplied plan. Red arrows = entrance. */
+/* Ширээний байрлал (шинэ зургаас): түлхүүр → [x, y]. Хүснэгтийн 2-р баганад яг эдгээр нэр бичигдэнэ.
+   "хос" = Хосын ширээ */
 const LAYOUT = {
   "1":[536,320],"2":[592,259],"3":[641,323],"4":[693,268],"5":[641,137],"6":[642,56],
   "7":[554,136],"8":[554,57],"9":[462,137],"10":[467,57],"11":[376,138],"12":[378,57],
   "13":[291,138],"14":[290,60],"15":[229,307],"16":[220,224],"17":[192,140],"18":[140,311],
-  "19":[131,225],"20":[99,141],"21":[56,311],"22":[47,224],"хос":[366,342]
+  "19":[131,225],"20":[99,141],"21":[56,311],"22":[47,224],
+  "хос":[366,342]
 };
 const VIEW = {x:-6, y:-6, w:900, h:376};
 
@@ -250,7 +268,7 @@ async function load(){
       const name = r[0].trim();
       const m = name.match(/^(?:[^\s.]{1,2}\.)+\s*(.+)$/);   // "Э.Бат-Эрдэнэ" → "Бат-Эрдэнэ"
       const tag = (r[2]||"").trim();                         // 3-р багана: ижил нэртэй хүмүүсийг ялгах шошго
-      const attended = String(r[3]||"").trim()==="1";          // column D: 1 = came, 0 = not yet
+      const attended = String(r[3]||"").trim()==="1";        // 4-р багана (D): ирц, 1 = ирсэн
       guests.push({name, tag, attended, table:key, key:clean(name), given:clean(m ? m[1] : name)});
     });
     const cnt = {}; guests.forEach(g=>cnt[g.key]=(cnt[g.key]||0)+1);
@@ -300,56 +318,104 @@ document.addEventListener("click",e=>{ if(!e.target.closest(".search")) $("list"
 
 /* ---------- plan ---------- */
 function tableSVG(k, hi){
-  const [x,y] = LAYOUT[k]; let chairs = "";
+  const [x,y] = LAYOUT[k];
+  let chairs = "";
   for(let i=0;i<10;i++) chairs += `<rect x="24" y="-4" width="10" height="8" rx="2" transform="rotate(${i*36})"/>`;
-  return `<g class="tbl${hi?" hi":""}" transform="translate(${x} ${y})">`+(hi?`<circle class="ring" r="36"/>`:"")+`<g class="ch">${chairs}</g><circle r="20"/><text>${labelOf(k)}</text></g>`;
+  return `<g class="tbl${hi?" hi":""}" transform="translate(${x} ${y})">`
+    + (hi ? `<circle class="ring" r="36"/>` : "")
+    + `<g class="ch">${chairs}</g><circle r="20"/><text>${labelOf(k)}</text></g>`;
 }
-const arrow=(cx,cy)=>`<path d="M${cx-5} ${cy-13}h10v14h6l-11 13-11-13h6z"/>`;
+const arrow = (cx,cy) => `<path d="M${cx-5} ${cy-13}h10v14h6l-11 13-11-13h6z"/>`;
 function drawPlan(el, hiKey){
-  const keys=Object.keys(LAYOUT).filter(k=>k!=="хос"), [cx,cy]=LAYOUT["хос"], hiCouple=hiKey==="хос";
-  el.classList.toggle("has-hi",!!hiKey);
-  el.innerHTML=`<svg viewBox="${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}" role="img" aria-label="Танхимын ширээний байршил">
-    <rect class="block" x="799" y="45" width="69" height="278"/><text class="stage-t" x="833.5" y="184">ТАЙЗ</text>
-    <rect class="block" x="16" y="65" width="31" height="117"/><text class="block-t" x="31.5" y="123.5">ТЕК</text>
-    <rect class="zone" x="626" y="99" width="171" height="171"/><rect class="floor" x="292" y="197" width="306" height="30"/>
-    <g class="entry">${arrow(186,36)}${arrow(251,38)}<text x="218.5" y="8">ENTRANCE</text></g>
+  const keys = Object.keys(LAYOUT).filter(k=>k!=="хос");
+  const [cx,cy] = LAYOUT["хос"];
+  const hiCouple = hiKey==="хос";
+  el.classList.toggle("has-hi", !!hiKey);
+  el.innerHTML = `<svg viewBox="${VIEW.x} ${VIEW.y} ${VIEW.w} ${VIEW.h}" role="img" aria-label="Танхимын ширээний байршил">
+    <rect class="block" x="799" y="45" width="69" height="278"/>
+    <text class="stage-t" x="833.5" y="184">ТАЙЗ</text>
+    <rect class="block" x="16" y="65" width="31" height="117"/>
+    <text class="block-t" x="31.5" y="123.5">ТЕК</text>
+    <rect class="zone" x="626" y="99" width="171" height="171"/>
+    <rect class="floor" x="292" y="197" width="306" height="30"/>
+    <g class="entry">${arrow(186,36)}${arrow(251,38)}<text x="218.5" y="8">ОРЦ</text></g>
     ${keys.filter(k=>k!==hiKey).map(k=>tableSVG(k,false)).join("")}
-    <g class="pill${hiCouple?" hi":""}">${hiCouple?`<ellipse class="ring" cx="${cx}" cy="${cy}" rx="40" ry="13"/>`:""}<ellipse cx="${cx}" cy="${cy}" rx="40" ry="13"/><text x="${cx}" y="${cy}">Хосын ширээ</text></g>
-    ${hiKey&&!hiCouple?tableSVG(hiKey,true):""}</svg>`;
-  if(hiKey) requestAnimationFrame(()=>{const svg=el.querySelector("svg"),scale=svg.getBoundingClientRect().width/VIEW.w;el.scrollLeft=(LAYOUT[hiKey][0]-VIEW.x)*scale-el.clientWidth/2});
+    <g class="pill${hiCouple?" hi":""}">
+      ${hiCouple?`<ellipse class="ring" cx="${cx}" cy="${cy}" rx="48" ry="14"/>`:""}
+      <ellipse cx="${cx}" cy="${cy}" rx="48" ry="14"/><text x="${cx}" y="${cy}">Хосын ширээ</text>
+    </g>
+    ${hiKey && !hiCouple ? tableSVG(hiKey,true) : ""}
+  </svg>`;
+  if(hiKey){
+    requestAnimationFrame(()=>{
+      const svg = el.querySelector("svg");
+      const scale = svg.getBoundingClientRect().width / VIEW.w;
+      el.scrollLeft = (LAYOUT[hiKey][0]-VIEW.x)*scale - el.clientWidth/2;
+    });
+  }
 }
 
 /* ---------- popup ---------- */
-let current=null;
+const ATT_LABEL = "Ирснээ баталгаажуулах";
+let current = null;
+
 function showAtt(){
-  const on=!!CONFIG.ATTENDANCE_URL&&!!current; $("attBox").hidden=!on; if(!on)return;
-  $("attErr").textContent=""; $("attBtn").disabled=false; $("attBtn").textContent="Attendance";
-  $("attBtn").hidden=current.attended; $("attDone").hidden=!current.attended;
+  const on = !!CONFIG.ATTENDANCE_URL && !!current;
+  $("attBox").hidden = !on;
+  if(!on) return;
+  $("attErr").textContent = "";
+  $("attBtn").disabled = false; $("attBtn").textContent = ATT_LABEL;
+  $("attBtn").hidden = current.attended;
+  $("attDone").hidden = !current.attended;
 }
 function choose(g){
-  current=g; $("list").hidden=true; $("q").blur(); $("resName").textContent=g.name; $("resTag").textContent=g.tag||"";
-  $("resNum").textContent=labelOf(g.table); $("resLine").textContent=sayOf(g.table); showAtt(); $("overlay").classList.add("open"); drawPlan($("resPlan"),g.table); $("closeBtn").focus();
+  current = g;
+  $("list").hidden=true; $("q").blur();
+  $("resName").textContent = g.name;
+  $("resTag").textContent = g.tag || "";
+  $("resNum").textContent = labelOf(g.table);
+  $("resLine").textContent = sayOf(g.table);
+  showAtt();
+  $("overlay").classList.add("open");
+  drawPlan($("resPlan"), g.table);
+  $("closeBtn").focus();
 }
-function closePop(){ $("overlay").classList.remove("open"); current=null; $("q").value=""; $("list").hidden=true; }
-$("closeBtn").addEventListener("click",closePop); $("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closePop()});
+function closePop(){
+  $("overlay").classList.remove("open");
+  current = null;
+  $("q").value=""; $("list").hidden=true;
+}
+$("closeBtn").addEventListener("click",closePop);
+$("overlay").addEventListener("click",e=>{ if(e.target.id==="overlay") closePop() });
 
 /* ---------- attendance ---------- */
-function openConfirm(){ if(current&&!current.attended){$("confirmOverlay").classList.add("open");$("confirmYes").focus()} }
-function closeConfirm(){ $("confirmOverlay").classList.remove("open") }
-function openOk(){ $("okOverlay").classList.add("open"); $("okClose").focus() }
-function closeOk(){ $("okOverlay").classList.remove("open"); if(current)$("closeBtn").focus() }
-$("attBtn").addEventListener("click",openConfirm); $("confirmNo").addEventListener("click",closeConfirm);
-$("confirmOverlay").addEventListener("click",e=>{if(e.target.id==="confirmOverlay")closeConfirm()});
-$("okClose").addEventListener("click",closeOk); $("okOverlay").addEventListener("click",e=>{if(e.target.id==="okOverlay")closeOk()});
-$("confirmYes").addEventListener("click",async()=>{
-  const g=current;if(!g||g.attended)return closeConfirm(); const btn=$("confirmYes");btn.disabled=true;btn.textContent="Recording…";$("attErr").textContent="";
+const openOk  = () => { $("okOverlay").classList.add("open"); $("okClose").focus() };
+const closeOk = () => { $("okOverlay").classList.remove("open"); if(current) $("closeBtn").focus() };
+$("okClose").addEventListener("click",closeOk);
+$("okOverlay").addEventListener("click",e=>{ if(e.target.id==="okOverlay") closeOk() });
+
+$("attBtn").addEventListener("click", async ()=>{
+  const g = current; if(!g || g.attended) return;
+  const btn = $("attBtn");
+  btn.disabled = true; btn.textContent = "Бүртгэж байна…"; $("attErr").textContent = "";
+  const ctl = new AbortController(), timer = setTimeout(()=>ctl.abort(), 15000);
   try{
-    const res=await fetch(CONFIG.ATTENDANCE_URL,{method:"POST",body:JSON.stringify({name:g.name,table:g.table,tag:g.tag})});
-    const data=await res.json(); if(!data.ok)throw new Error(data.error||"failed"); g.attended=true; closeConfirm(); showAtt(); openOk();
-  }catch(e){closeConfirm();$("attErr").textContent="Could not record attendance. Please try again."}
-  finally{btn.disabled=false;btn.textContent="Confirm"}
+    const res  = await fetch(CONFIG.ATTENDANCE_URL, {method:"POST", body:JSON.stringify({name:g.name, table:g.table, tag:g.tag}), signal:ctl.signal});
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "failed");
+    g.attended = true;
+    if(current===g) showAtt();
+    openOk();
+  }catch(e){
+    if(current===g){ btn.disabled = false; btn.textContent = ATT_LABEL; $("attErr").textContent = "Бүртгэж чадсангүй. Дахин оролдоно уу."; }
+  }finally{ clearTimeout(timer) }
 });
-document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if($("okOverlay").classList.contains("open"))closeOk();else if($("confirmOverlay").classList.contains("open"))closeConfirm();else if($("overlay").classList.contains("open"))closePop()});
+
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape") return;
+  if($("okOverlay").classList.contains("open")) closeOk();
+  else if($("overlay").classList.contains("open")) closePop();
+});
 
 load();
 </script>
